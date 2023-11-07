@@ -1,0 +1,25 @@
+# -*- coding: utf-8 -*-
+import cv2
+from GetTiff import Tiff
+import numpy as np
+
+A=Tiff()
+
+data01 = A.read_tif("watershed_result01.tif")
+Data01 = data01[2]
+
+mat01= Data01
+#将分水岭运算结果的边界线属性值由-1变为1，与背景值一致
+mat01[Data01==-1]=1
+#将分水岭运算结果中的水体结果属性值统一变为2
+mat01[Data01>1]=2
+#矩阵元素类型设置为uint8
+mat02 = mat01.astype(np.uint8)
+
+kernel = np.ones((3,3),np.uint8)
+
+mat03 = cv2.dilate(mat02,kernel,iterations=1)
+
+A.write_tif("watershed_postprocess.tif",data01[0],data01[1],mat03)
+
+print('ok')
